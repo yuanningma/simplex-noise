@@ -12,6 +12,9 @@ import javax.imageio.ImageIO;
 import perlin.OpenSimplexNoise;
 import perlin.Perlin;
 
+/*
+ * Playing around with Simplex Noise.
+ */
 public class Main {
 	
 //	Perlin p = new Perlin();
@@ -26,9 +29,19 @@ public class Main {
 		    this.args = args;
 		  }
 	 
+	 /*
+	  * Summing different noises generates noise that looks more like continents. I sum over the sums of 
+	  * noises to get it to look even better.
+	  */
 	 private double summyOctave(int x, int y, long seed) {
 		 return (1*this.sumOctave(4, x, y, 0.5, 0.02, -1, 1, seed) + 0.5*this.sumOctave(4, 2*x, 2*y, 0.5, 0.02, -1, 1, seed) + 0.25*this.sumOctave(4, 4*x, 4*y, 0.5, 0.02, -1, 1, seed) + 0.125*this.sumOctave(4, 8*x, 8*y, 0.5, 0.02, -1, 1, seed))/1.875;
 	 }
+	 /*
+	  * A single weighted sum over noises.. This turns the noise from random and scattered-looking to somewhat more
+	  * uniform and cloud-like, like the Cloud filter in Photoshop. I find that simply summing once like this over
+	  * noise leaves something to be desired, so I take the results from this weighted sum and weighted sum those
+	  * to generate better-looking noise.
+	  */
 	 private double sumOctave(int numIter, int x, int y, double persistence, double scale, double lo, double hi, long seed) {
 		 //		 System.out.println(rand.nextLong());
 		 OpenSimplexNoise os = new OpenSimplexNoise(seed);
@@ -55,13 +68,13 @@ public class Main {
 			  for (int i = 0; i < 10; i++) {
 				  nums[i] = 0;
 			  }
-		    // Parse command line arguments
 		    BufferedImage img = 
 		    	    new BufferedImage(1000, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		    File f = null;
-		    File f3 = null;
-		    BufferedImage img3 = new BufferedImage(1000, 500, BufferedImage.TYPE_INT_ARGB);
-		    double scale = .007;
+
+//		    File f3 = null;
+//		    BufferedImage img3 = new BufferedImage(1000, 500, BufferedImage.TYPE_INT_ARGB);
+//		    double scale = .007;
 		    
 		    double min = 999;
 		    double max = -999;
@@ -72,6 +85,10 @@ public class Main {
 		    	
 		    for (int i = 0; i < 500; i++) {
 		    	for (int j = 0; j < 1000; j++) {
+		    		
+		    		// Different ways to generate the elevation/noise. I was experimenting
+		    		// and decided that my summyOctave method produces the best-looking results.
+		    		
 //		    		double v = (os.eval(j*scale, i*scale) + 1)/2.0;
 //		    		double v = os.eval(j, i);
 //		    		double v = os.eval(j*scale, i*scale);
@@ -85,7 +102,11 @@ public class Main {
 //		    			v = summyOctave(j, i);
 //			    		System.out.println(v);
 //		    		}
-		    		v = Math.pow(v, 7);
+		    		
+		    		// Raising to a power generates smoother valleys and mountains, making it better
+		    		// for the purposes of generating a heightmap for a fractal map.
+		    		
+//		    		v = Math.pow(v, 7);
 		    		if (v > max) {
 		    			max = v;
 		    		}
@@ -93,107 +114,110 @@ public class Main {
 		    			min = v;
 		    		}
 		    		System.out.println("2nd v: " + v);
-//		    		int a, r, g, b;
-//		    		a = (int)(Math.round((v + 1)*(255/2)));
-//		    		System.out.println("a is: " + a);
-//		    		r = a;
-//		    		g = a;
-//		    		b = a;
-//		    		int p = (a<<24) | (r<<16) | (g<<8) | b;
-//		    		img.setRGB(j, i, p);
-
 		    		
-		    		if (v < -.06) {
-		    			int a = (int)(0); //generating 
-		                int r = (int)(0); //values 
-		                int g = (int)(0); //less than 
-		                int b = (int)(0); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j, i, p); 
-		    		} else if (v < -.055){
-		    			int a = (int)(50); //generating 
-		                int r = (int)(50); //values 
-		                int g = (int)(50); //less than 
-		                int b = (int)(50); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < -.045) {
-		    			int a = (int)(70); //generating 
-		                int r = (int)(70); //values 
-		                int g = (int)(70); //less than 
-		                int b = (int)(70); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < -.03) {
-		    			int a = (int)(90); //generating 
-		                int r = (int)(90); //values 
-		                int g = (int)(90); //less than 
-		                int b = (int)(90); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < -.2) {
-		    			int a = (int)(110); //generating 
-		                int r = (int)(110); //values 
-		                int g = (int)(110); //less than 
-		                int b = (int)(110); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < .0) {
-		    			int a = (int)(130); //generating 
-		                int r = (int)(130); //values 
-		                int g = (int)(130); //less than 
-		                int b = (int)(130); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < .03) {
-		    			int a = (int)(150); //generating 
-		                int r = (int)(150); //values 
-		                int g = (int)(150); //less than 
-		                int b = (int)(150); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < .045) {
-		    			int a = (int)(170); //generating 
-		                int r = (int)(170); //values 
-		                int g = (int)(170); //less than 
-		                int b = (int)(170); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else if (v < .06) {
-		    			int a = (int)(190); //generating 
-		                int r = (int)(190); //values 
-		                int g = (int)(190); //less than 
-		                int b = (int)(190); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		} else {
-		    			int a = (int)(210); //generating 
-		                int r = (int)(210); //values 
-		                int g = (int)(210); //less than 
-		                int b = (int)(210); //256 
-		  
-		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
-		  
-		                img.setRGB(j,i, p); 
-		    		}
+		    		// This will just create noise
+		    		int a, r, g, b;
+		    		a = (int)(Math.round((v + 1)*(255/2)));
+		    		System.out.println("a is: " + a);
+		    		r = a;
+		    		g = a;
+		    		b = a;
+		    		int p = (a<<24) | (r<<16) | (g<<8) | b;
+		    		img.setRGB(j, i, p);
+		    		
+		    		// This will create continent-looking swathes
+		    		
+//		    		if (v < -.06) {
+//		    			int a = (int)(0); //generating 
+//		                int r = (int)(0); //values 
+//		                int g = (int)(0); //less than 
+//		                int b = (int)(0); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j, i, p); 
+//		    		} else if (v < -.055){
+//		    			int a = (int)(50); //generating 
+//		                int r = (int)(50); //values 
+//		                int g = (int)(50); //less than 
+//		                int b = (int)(50); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < -.045) {
+//		    			int a = (int)(70); //generating 
+//		                int r = (int)(70); //values 
+//		                int g = (int)(70); //less than 
+//		                int b = (int)(70); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < -.03) {
+//		    			int a = (int)(90); //generating 
+//		                int r = (int)(90); //values 
+//		                int g = (int)(90); //less than 
+//		                int b = (int)(90); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < -.2) {
+//		    			int a = (int)(110); //generating 
+//		                int r = (int)(110); //values 
+//		                int g = (int)(110); //less than 
+//		                int b = (int)(110); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < .0) {
+//		    			int a = (int)(130); //generating 
+//		                int r = (int)(130); //values 
+//		                int g = (int)(130); //less than 
+//		                int b = (int)(130); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < .03) {
+//		    			int a = (int)(150); //generating 
+//		                int r = (int)(150); //values 
+//		                int g = (int)(150); //less than 
+//		                int b = (int)(150); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < .045) {
+//		    			int a = (int)(170); //generating 
+//		                int r = (int)(170); //values 
+//		                int g = (int)(170); //less than 
+//		                int b = (int)(170); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else if (v < .06) {
+//		    			int a = (int)(190); //generating 
+//		                int r = (int)(190); //values 
+//		                int g = (int)(190); //less than 
+//		                int b = (int)(190); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		} else {
+//		    			int a = (int)(210); //generating 
+//		                int r = (int)(210); //values 
+//		                int g = (int)(210); //less than 
+//		                int b = (int)(210); //256 
+//		  
+//		                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel 
+//		  
+//		                img.setRGB(j,i, p); 
+//		    		}
 //		    	if (v < -0.8) {
 //	    			int a = (int)(0); //generating 
 //	                int r = (int)(0); //values 
@@ -304,10 +328,12 @@ public class Main {
 		  float[][] perly = perl.generateWhiteNoise(640, 320);
 		  BufferedImage img2 = 
 		    	    new BufferedImage(640, 320, BufferedImage.TYPE_INT_ARGB);
-		    File f2 = null;
 		    for (int i = 0; i < 320; i++) {
 		    	for (int j = 0; j < 640; j++) {
 //		    		double v = os.eval(j, i);
+		    		
+		    		// Perly was my attempt to create Perlin noise, but it didn't look particularly
+		    		// good. I want to try doing the weighted sum thing here to see what it looks like.
 		    		double v = perly[j][i];
 		    		
 //		    		System.out.println(v);
@@ -420,34 +446,6 @@ public class Main {
 		    	}
 		    	sum += nums[i];
 		    }
-//		    System.out.println();
-//		    System.out.println("Raw numbers");
-//		    System.out.println();
-//		    for (int i = 0; i < 10; i++) {
-//		    	System.out.print("(" + i + " , " + nums[i] + " ), ");
-//		    	
-//		    }
-//		    System.out.println();
-//		    System.out.println("Scaled to max");
-//		    System.out.println();
-//		    for (int i = 0; i < 10; i++) {
-//		    	System.out.print("(" + i + " , " + nums[i]/max + " ), ");
-//		    }
-//		    System.out.println();
-//		    System.out.println("Scaled to total");
-//		    System.out.println();
-//		    for (int i = 0; i < 10; i++) {
-//		    	System.out.print("(" + i + " , " + nums[i]/sum + " ), ");
-//		    }
-//		    System.out.println();
-//		    System.out.println("Cumulative");
-//		    System.out.println();
-//		    double prevsum = 0;
-//		    for (int i = 0; i < 10; i++) {
-//		    	prevsum += nums[i];
-//		    	System.out.print("(" + i + " , " + prevsum/sum + "), " );
-//		    }
-		    
 		    try
 	        { 
 	            f = new File("D:\\China Work\\Out2.jpg"); 
